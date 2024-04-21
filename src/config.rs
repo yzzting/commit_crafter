@@ -5,10 +5,12 @@ use toml;
 #[derive(Deserialize)]
 struct Config {
     open_ai_key: String,
+    open_ai_url: String,
 }
 
 pub enum ConfigKey {
     OpenaiApiKey,
+    OpenaiApiUrl,
 }
 
 pub fn get_config_key(key: ConfigKey) -> String {
@@ -17,5 +19,6 @@ pub fn get_config_key(key: ConfigKey) -> String {
 
     match key {
         ConfigKey::OpenaiApiKey => config.open_ai_key,
+        ConfigKey::OpenaiApiUrl => config.open_ai_url,
     }
 }
