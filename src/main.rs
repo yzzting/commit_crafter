@@ -22,7 +22,6 @@ fn main() {
         }
         None => match git_integration::run_git_diff() {
             Ok(output) => {
-                println!("Git Diff Output: {}", output);
                 if output.is_empty() {
                     eprintln!("Error: No changes to commit");
                     std::process::exit(1);

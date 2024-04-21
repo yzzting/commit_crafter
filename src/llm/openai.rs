@@ -33,7 +33,7 @@ pub fn openai_request(diff_content: &str) -> Result<(), Error> {
     if response.status().is_success() {
         let response_json: Value = response.json()?;
         if let Some(text) = response_json["choices"][0]["message"]["content"].as_str() {
-            println!("output: {}", text);
+            println!("{}", text);
         } else {
             eprintln!("Error: Could not parse response");
         }
