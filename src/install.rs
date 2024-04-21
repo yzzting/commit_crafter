@@ -34,9 +34,10 @@ pub fn install_commit_msg_hook() {
         r#"
 #!/bin/sh
 
+echo "Generating commit message from OpenAI..."
 COMMIT_MSG=$({})
 if [ $? -ne 0 ]; then
-    echo "Failed to generate commit message!"
+    echo "Failed to generate commit message!!"
     exit 1
 fi
 echo "$COMMIT_MSG" > $1
