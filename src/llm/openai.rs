@@ -2,7 +2,7 @@ use reqwest::blocking::Client;
 use reqwest::Error;
 use serde_json::{json, Value};
 
-use crate::config::{get_config_key, VALID_OPENAI_API_KEY, VALID_OPENAI_URL};
+use crate::config::{get_config_key, get_language, VALID_OPENAI_API_KEY, VALID_OPENAI_URL};
 
 pub fn openai_request(diff_content: &str) -> Result<(), Error> {
     let openai_api_key = get_config_key(VALID_OPENAI_API_KEY);
@@ -11,6 +11,7 @@ pub fn openai_request(diff_content: &str) -> Result<(), Error> {
         eprintln!("Error: OpenAI API key or URL is empty");
         std::process::exit(1);
     }
+    let prompt = get_language();
     let client = Client::new();
     let response = client
         .post(format!("{}/v1/chat/completions", openai_url))
@@ -20,7 +21,7 @@ pub fn openai_request(diff_content: &str) -> Result<(), Error> {
             "messages": [
                 {
                     "role": "system",
-                    "content": "Please generate a commit message based on the following git diff:"
+                    "content": prompt
                 },
                 {
                     "role": "user",
