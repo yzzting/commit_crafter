@@ -16,8 +16,19 @@ In the git project, install the prepare-commit-msg hook and set up the OpenAI AP
 
 ```bash
 commit-crafter initstall
+```
 
-commit-crafter config set openai_ai_key <your key>
+## Options
+
+```bash
+// openai api key
+commit-crafter config set openai_api_key <your key>
+
+// openai_url
+commit-crafter config set openai_url <your url>
+
+// prompt language
+commit-crafter config set user_language <your language>
 ```
 
 ## Usage
