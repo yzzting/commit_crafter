@@ -77,3 +77,14 @@ pub fn get_language() -> String {
         _ => panic!("Invalid user language"),
     }
 }
+
+pub fn generate_config_toml() {
+    let config = Config {
+        openai_api_key: "".to_string(),
+        openai_url: "".to_string(),
+        openai_model: "".to_string(),
+        user_language: "en".to_string(),
+    };
+    let config_toml = toml::to_string(&config).expect("Could not serialize config");
+    fs::write("config.toml", config_toml).expect("Could not write to config file");
+}

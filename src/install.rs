@@ -3,11 +3,19 @@ use std::fs::File;
 use std::io::{self, Write};
 use std::path::Path;
 
+use crate::config::generate_config_toml;
+
 pub fn install_commit_msg_hook() {
     let git_dir = Path::new(".git");
     if !git_dir.exists() || !git_dir.is_dir() {
         eprintln!("Error: Not a git repository");
         std::process::exit(1);
+    }
+
+    let config_toml = Path::new("config.toml");
+    if !config_toml.exists() {
+        println!("Error: config.toml not found. Start generating default files.");
+        generate_config_toml();
     }
 
     let current_exe_path = env::current_exe()
