@@ -27,7 +27,8 @@ pub fn openai_request(diff_content: &str) -> Result<(), Error> {
                     "role": "user",
                     "content": diff_content
                 }
-            ]
+            ],
+            "max_tokens": 60
         }))
         .send()?;
 
