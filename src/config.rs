@@ -53,7 +53,7 @@ pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::
     match key {
         VALID_OPENAI_API_KEY => config.openai_api_key = value.to_string(),
         VALID_OPENAI_URL => config.openai_url = value.to_string(),
-
+        VALID_OPENAI_MODEL => config.openai_model = value.to_string(),
         VALID_USER_LANGUAGE => config.user_language = value.to_string(),
         _ => panic!("Invalid configuration key"),
     }
