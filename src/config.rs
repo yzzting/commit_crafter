@@ -6,19 +6,25 @@ use toml;
 struct Config {
     openai_api_key: String,
     openai_url: String,
-    default_language: String,
     user_language: String,
+}
+
+#[derive(Deserialize, Serialize)]
+struct PromptConfig {
+    prompt_zh: String,
+    prompt_en: String,
+    prompt_jp: String,
+    prompt_zh_tw: String,
 }
 
 pub const VALID_OPENAI_API_KEY: &str = "openai_api_key";
 pub const VALID_OPENAI_URL: &str = "openai_url";
-const VALID_DEFAULT_LANGUAGE: &str = "default_language";
 const VALID_USER_LANGUAGE: &str = "user_language";
 
 pub fn validate_config_key(key: &str) -> Result<&str, &'static str> {
     match key {
         VALID_OPENAI_API_KEY | VALID_OPENAI_URL => Ok(key),
-        VALID_DEFAULT_LANGUAGE | VALID_USER_LANGUAGE => Ok(key),
+        VALID_USER_LANGUAGE => Ok(key),
         _ => Err("Invalid configuration key"),
     }
 }
@@ -31,7 +37,6 @@ pub fn get_config_key(key: &str) -> String {
     match key {
         VALID_OPENAI_API_KEY => config.openai_api_key,
         VALID_OPENAI_URL => config.openai_url,
-        VALID_DEFAULT_LANGUAGE => config.default_language,
         VALID_USER_LANGUAGE => config.user_language,
         _ => panic!("Invalid configuration key"),
     }
@@ -45,7 +50,6 @@ pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::
     match key {
         VALID_OPENAI_API_KEY => config.openai_api_key = value.to_string(),
         VALID_OPENAI_URL => config.openai_url = value.to_string(),
-        VALID_DEFAULT_LANGUAGE => config.default_language = value.to_string(),
         VALID_USER_LANGUAGE => config.user_language = value.to_string(),
         _ => panic!("Invalid configuration key"),
     }
@@ -56,11 +60,16 @@ pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::
 }
 
 pub fn get_language() -> String {
-    let default_language = get_config_key(VALID_DEFAULT_LANGUAGE);
     let user_language = get_config_key(VALID_USER_LANGUAGE);
-    if user_language.is_empty() {
-        default_language
-    } else {
-        user_language
+    let prompt_file = fs::read_to_string("prompt.toml").expect("Could not read prompt config file");
+    let prompt_config: PromptConfig =
+        toml::from_str(&prompt_file).expect("Could not parse prompt config file");
+
+    match user_language.as_str() {
+        "zh" => prompt_config.prompt_zh.clone(),
+        "en" => prompt_config.prompt_en.clone(),
+        "jp" => prompt_config.prompt_jp.clone(),
+        "zh_tw" => prompt_config.prompt_zh_tw.clone(),
+        _ => panic!("Invalid user language"),
     }
 }

@@ -1,0 +1,4 @@
+prompt_zh = "根据以下的git差异内容，生成一个简洁的提交信息。根据更改的性质，以以下其中一个前缀开头：'build'（构建系统），'chore'（杂务），'ci'（持续集成），'docs'（文档），'feat'（新功能），'fix'（修复），'perf'（性能），'refactor'（重构），'style'（样式），'test'（测试）："
+prompt_en = "Based on the following git diff content, generate a concise commit message. Start with one of the following prefixes according to the nature of the change: 'build' (build system), 'chore' (miscellaneous), 'ci' (continuous integration), 'docs' (documentation), 'feat' (new feature), 'fix' (fix), 'perf' (performance), 'refactor' (refactor), 'style' (style), 'test' (test):"
+prompt_jp = "以下のgitの差分内容に基づいて、簡潔なコミットメッセージを生成します。変更の性質に応じて、次の接頭辞のいずれかで始めます：'build'（ビルドシステム）、'chore'（その他）、'ci'（継続的統合）、'docs'（ドキュメント）、'feat'（新機能）、'fix'（修正）、'perf'（パフォーマンス）、'refactor'（リファクタリング）、'style'（スタイル）、'test'（テスト）："
+prompt_zh_tw = "根據以下的git差異內容，生成一個簡潔的提交信息。根據更改的性質，以以下其中一個前綴開頭：'build'（構建系統），'chore'（雜務），'ci'（持續集成），'docs'（文檔），'feat'（新功能），'fix'（修復），'perf'（性能），'refactor'（重構），'style'（樣式），'test'（測試）："
