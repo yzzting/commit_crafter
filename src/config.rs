@@ -6,6 +6,7 @@ use toml;
 struct Config {
     openai_api_key: String,
     openai_url: String,
+    openai_model: String,
     user_language: String,
 }
 
@@ -19,11 +20,12 @@ struct PromptConfig {
 
 pub const VALID_OPENAI_API_KEY: &str = "openai_api_key";
 pub const VALID_OPENAI_URL: &str = "openai_url";
+pub const VALID_OPENAI_MODEL: &str = "openai_model";
 const VALID_USER_LANGUAGE: &str = "user_language";
 
 pub fn validate_config_key(key: &str) -> Result<&str, &'static str> {
     match key {
-        VALID_OPENAI_API_KEY | VALID_OPENAI_URL => Ok(key),
+        VALID_OPENAI_API_KEY | VALID_OPENAI_URL | VALID_OPENAI_MODEL => Ok(key),
         VALID_USER_LANGUAGE => Ok(key),
         _ => Err("Invalid configuration key"),
     }
@@ -37,6 +39,7 @@ pub fn get_config_key(key: &str) -> String {
     match key {
         VALID_OPENAI_API_KEY => config.openai_api_key,
         VALID_OPENAI_URL => config.openai_url,
+        VALID_OPENAI_MODEL => config.openai_model,
         VALID_USER_LANGUAGE => config.user_language,
         _ => panic!("Invalid configuration key"),
     }
@@ -50,6 +53,7 @@ pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::
     match key {
         VALID_OPENAI_API_KEY => config.openai_api_key = value.to_string(),
         VALID_OPENAI_URL => config.openai_url = value.to_string(),
+
         VALID_USER_LANGUAGE => config.user_language = value.to_string(),
         _ => panic!("Invalid configuration key"),
     }

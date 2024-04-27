@@ -2,11 +2,14 @@ use reqwest::blocking::Client;
 use reqwest::Error;
 use serde_json::{json, Value};
 
-use crate::config::{get_config_key, get_language, VALID_OPENAI_API_KEY, VALID_OPENAI_URL};
+use crate::config::{
+    get_config_key, get_language, VALID_OPENAI_API_KEY, VALID_OPENAI_MODEL, VALID_OPENAI_URL,
+};
 
 pub fn openai_request(diff_content: &str) -> Result<(), Error> {
     let openai_api_key = get_config_key(VALID_OPENAI_API_KEY);
     let openai_url = get_config_key(VALID_OPENAI_URL);
+    let openai_model = get_config_key(VALID_OPENAI_MODEL);
     if openai_api_key.is_empty() || openai_url.is_empty() {
         eprintln!("Error: OpenAI API key or URL is empty");
         std::process::exit(1);
@@ -17,7 +20,7 @@ pub fn openai_request(diff_content: &str) -> Result<(), Error> {
         .post(format!("{}/v1/chat/completions", openai_url))
         .header("Authorization", format!("Bearer {}", openai_api_key))
         .json(&json!({
-            "model": "gpt-3.5-turbo",
+            "model": openai_model,
             "messages": [
                 {
                     "role": "system",
