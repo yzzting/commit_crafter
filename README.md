@@ -24,8 +24,11 @@ commit-crafter initstall
 // openai api key
 commit-crafter config set openai_api_key <your key>
 
-// openai_url
+// openai url
 commit-crafter config set openai_url <your url>
+
+// openai model
+commit-crafter config set openai_model <your model>
 
 // prompt language
 commit-crafter config set user_language <your language>
