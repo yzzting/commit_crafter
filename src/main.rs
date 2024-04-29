@@ -1,7 +1,6 @@
-mod config;
-mod git_integration;
-mod install;
-mod llm;
+extern crate commit_crafter;
+
+use commit_crafter::{config, git_integration, install, llm};
 
 use clap::{arg, Command};
 
