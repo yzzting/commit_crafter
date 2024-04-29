@@ -1,15 +1,15 @@
 use std::env;
 use std::fs::File;
-use std::io::{self, Write};
+use std::io::{self, Error, ErrorKind, Result, Write};
 use std::path::Path;
 
 use crate::config::generate_config_toml;
 
-pub fn install_commit_msg_hook() {
+pub fn install_commit_msg_hook() -> Result<()> {
     let git_dir = Path::new(".git");
     if !git_dir.exists() || !git_dir.is_dir() {
         eprintln!("Error: Not a git repository");
-        std::process::exit(1);
+        return Err(Error::new(ErrorKind::NotFound, "Not a git repository"));
     }
 
     let config_toml = Path::new("config.toml");
@@ -33,7 +33,10 @@ pub fn install_commit_msg_hook() {
             .expect("Error reading input");
         if input.trim() != "y" {
             eprintln!("Error: prepare-commit-msg hook already exists. Exiting...");
-            std::process::exit(1);
+            return Err(Error::new(
+                ErrorKind::AlreadyExists,
+                "prepare-commit-msg hook already exists",
+            ));
         }
     }
 
@@ -71,4 +74,6 @@ echo "$COMMIT_MSG" > $1
         file.set_permissions(permissions)
             .expect("Error setting file permissions");
     }
+
+    Ok(())
 }
