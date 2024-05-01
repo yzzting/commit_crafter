@@ -30,7 +30,7 @@ fn main() {
 
     match matches.subcommand() {
         Some(("install", _sub_matches)) => {
-            install::install_commit_msg_hook();
+            let _ = install::install_commit_msg_hook();
         }
         Some(("config", sub_matches)) => {
             if let Some(set_matches) = sub_matches.subcommand_matches("set") {
