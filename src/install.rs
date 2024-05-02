@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{self, Error, ErrorKind, Result, Write};
 use std::path::Path;
 
-use crate::config::generate_config_toml;
+use crate::config::{generate_config_toml, write_config_to_toml};
 
 pub fn install_commit_msg_hook() -> Result<()> {
     let git_dir = Path::new(".git");
@@ -15,7 +15,8 @@ pub fn install_commit_msg_hook() -> Result<()> {
     let config_toml = Path::new("config.toml");
     if !config_toml.exists() {
         println!("Error: config.toml not found. Start generating default files.");
-        generate_config_toml();
+        let config_str = generate_config_toml();
+        write_config_to_toml(&config_str, config_toml)
     }
 
     let current_exe_path = env::current_exe()

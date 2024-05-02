@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::path::Path;
 use toml;
 
 #[derive(Deserialize, Serialize)]
@@ -78,13 +79,16 @@ pub fn get_language() -> String {
     }
 }
 
-pub fn generate_config_toml() {
+pub fn generate_config_toml() -> String {
     let config = Config {
         openai_api_key: "".to_string(),
         openai_url: "".to_string(),
         openai_model: "".to_string(),
         user_language: "en".to_string(),
     };
-    let config_toml = toml::to_string(&config).expect("Could not serialize config");
-    fs::write("config.toml", config_toml).expect("Could not write to config file");
+    toml::to_string(&config).expect("Could not serialize config")
+}
+
+pub fn write_config_to_toml(config_toml: &str, path: &Path) {
+    fs::write(path, config_toml).expect("Could not write to config file");
 }
