@@ -7,7 +7,7 @@ use crate::config::{
     VALID_USER_LANGUAGE,
 };
 
-pub fn openai_request(diff_content: &str) -> Result<()> {
+pub fn openai_request(diff_content: &str, path: &str) -> Result<()> {
     let keys = [
         VALID_OPENAI_API_KEY,
         VALID_OPENAI_URL,
@@ -18,7 +18,7 @@ pub fn openai_request(diff_content: &str) -> Result<()> {
     let mut openai_url = String::new();
     let mut openai_model = String::new();
     let mut user_language = String::new();
-    match get_config_key(&keys) {
+    match get_config_key(&keys, path) {
         Ok(values) => {
             openai_api_key = values[0].clone();
             openai_url = values[1].clone();

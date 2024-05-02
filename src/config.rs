@@ -32,8 +32,8 @@ pub fn validate_config_key(key: &str) -> Result<&str, &'static str> {
     }
 }
 
-pub fn get_config_key(keys: &[&str]) -> Result<Vec<String>, &'static str> {
-    let config_file = fs::read_to_string("config.toml").expect("Could not read config file");
+pub fn get_config_key<P: AsRef<Path>>(keys: &[&str], path: P) -> Result<Vec<String>, &'static str> {
+    let config_file = fs::read_to_string(path.as_ref()).expect("Could not read config file");
     let config: Config = toml::from_str(&config_file).expect("Could not parse config file");
 
     let mut result = Vec::new();

@@ -49,7 +49,7 @@ fn main() {
                     eprintln!("Error: No changes to commit");
                     std::process::exit(1);
                 }
-                llm::openai::openai_request(&output).unwrap();
+                llm::openai::openai_request(&output, "config.toml").unwrap();
             }
             Err(e) => eprintln!("Error: {}", e),
         },
