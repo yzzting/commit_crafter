@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::fs;
 use std::path::Path;
+use std::{fs, result};
 use toml;
 
 #[derive(Deserialize, Serialize)]
@@ -22,7 +22,7 @@ struct PromptConfig {
 pub const VALID_OPENAI_API_KEY: &str = "openai_api_key";
 pub const VALID_OPENAI_URL: &str = "openai_url";
 pub const VALID_OPENAI_MODEL: &str = "openai_model";
-const VALID_USER_LANGUAGE: &str = "user_language";
+pub const VALID_USER_LANGUAGE: &str = "user_language";
 
 pub fn validate_config_key(key: &str) -> Result<&str, &'static str> {
     match key {
@@ -32,18 +32,28 @@ pub fn validate_config_key(key: &str) -> Result<&str, &'static str> {
     }
 }
 
-pub fn get_config_key(key: &str) -> String {
+pub fn get_config_key(keys: &[&str]) -> Result<Vec<String>, &'static str> {
     let config_file = fs::read_to_string("config.toml").expect("Could not read config file");
     let config: Config = toml::from_str(&config_file).expect("Could not parse config file");
 
-    let key = validate_config_key(key).expect("Invalid configuration key");
-    match key {
-        VALID_OPENAI_API_KEY => config.openai_api_key,
-        VALID_OPENAI_URL => config.openai_url,
-        VALID_OPENAI_MODEL => config.openai_model,
-        VALID_USER_LANGUAGE => config.user_language,
-        _ => panic!("Invalid configuration key"),
+    let mut result = Vec::new();
+
+    for key in keys {
+        match validate_config_key(key) {
+            Ok(vaild_key) => {
+                let value = match vaild_key {
+                    VALID_OPENAI_API_KEY => config.openai_api_key.clone(),
+                    VALID_OPENAI_URL => config.openai_url.clone(),
+                    VALID_OPENAI_MODEL => config.openai_model.clone(),
+                    VALID_USER_LANGUAGE => config.user_language.clone(),
+                    _ => panic!("Invalid configuration key"),
+                };
+                result.push(value);
+            }
+            Err(_) => return Err("Invalid configuration key"),
+        }
     }
+    Ok(result)
 }
 
 pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -62,21 +72,6 @@ pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::
     fs::write("config.toml", new_config).expect("Could not write to config file");
 
     Ok(())
-}
-
-pub fn get_language() -> String {
-    let user_language = get_config_key(VALID_USER_LANGUAGE);
-    let prompt_file = fs::read_to_string("prompt.toml").expect("Could not read prompt config file");
-    let prompt_config: PromptConfig =
-        toml::from_str(&prompt_file).expect("Could not parse prompt config file");
-
-    match user_language.as_str() {
-        "zh" => prompt_config.prompt_zh.clone(),
-        "en" => prompt_config.prompt_en.clone(),
-        "jp" => prompt_config.prompt_jp.clone(),
-        "zh_tw" => prompt_config.prompt_zh_tw.clone(),
-        _ => panic!("Invalid user language"),
-    }
 }
 
 pub fn generate_config_toml() -> String {
