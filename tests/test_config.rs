@@ -9,7 +9,7 @@ fn test_generate_config_toml() {
     assert!(toml_str.contains("openai_url = \"\""));
     assert!(toml_str.contains("openai_model = \"\""));
     assert!(toml_str.contains("user_language = \"en\""));
-} 
+}
 
 #[test]
 fn test_write_config_toml() {
@@ -20,4 +20,20 @@ fn test_write_config_toml() {
 
     let write_content = fs::read_to_string(&file_path).unwrap();
     assert_eq!(config_str, write_content);
+}
+
+#[test]
+fn test_set_config_key() {
+    let temp_dir = tempdir().unwrap();
+    let file_path = temp_dir.path().join("config.toml");
+
+    let config_str = config::generate_config_toml();
+    config::write_config_to_toml(&config_str, &file_path);
+
+    config::set_config_key("openai_api_key", "test_key", &file_path).unwrap();
+
+    let new_config_str = fs::read_to_string(&file_path).unwrap();
+    assert!(new_config_str.contains("openai_api_key = \"test_key\""));
+
+    temp_dir.close().unwrap();
 }

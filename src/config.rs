@@ -56,8 +56,12 @@ pub fn get_config_key<P: AsRef<Path>>(keys: &[&str], path: P) -> Result<Vec<Stri
     Ok(result)
 }
 
-pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let config_file = fs::read_to_string("config.toml").expect("Could not read config file");
+pub fn set_config_key<P: AsRef<Path> + Clone>(
+    key: &str,
+    value: &str,
+    path: P,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let config_file = fs::read_to_string(path.as_ref()).expect("Could not read config file");
     let mut config: Config = toml::from_str(&config_file).expect("Could not parse config file");
 
     let key = validate_config_key(key).expect("Invalid configuration key");
@@ -69,7 +73,7 @@ pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::
         _ => panic!("Invalid configuration key"),
     }
     let new_config = toml::to_string(&config).expect("Could not serialize config");
-    fs::write("config.toml", new_config).expect("Could not write to config file");
+    fs::write(path, new_config).expect("Could not write to config file");
 
     Ok(())
 }

@@ -8,11 +8,8 @@ fn test_openai_request_by_no_config() {
     let config_str = config::generate_config_toml();
     config::write_config_to_toml(&config_str, &file_path);
 
-    // set the environment to use the temp directory
-    std::env::set_current_dir(temp_dir.path()).unwrap();
-
     // run openai_request
-    let result = llm::openai::openai_request("diff_content");
+    let result = llm::openai::openai_request("diff_content", file_path.to_str().unwrap());
 
     match result {
         Ok(_) => panic!("Expected an error of 'NotFound', got {:?}", result),
@@ -25,11 +22,8 @@ fn test_openai_request_by_no_config() {
 
 #[test]
 fn test_openai_request() {
-    // set the environment to project root
-    std::env::set_current_dir(".").unwrap();
-
     // run openai_request
-    let result = llm::openai::openai_request("diff_content");
+    let result = llm::openai::openai_request("diff_content", "config.toml");
 
     match result {
         Ok(_) => assert!(true),

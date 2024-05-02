@@ -37,7 +37,7 @@ fn main() {
                 let key = set_matches.get_one::<String>("KEY").unwrap();
                 let value = set_matches.get_one::<String>("VALUE").unwrap();
                 println!("Setting {} to {}", key, value);
-                config::set_config_key(key, value).unwrap();
+                config::set_config_key(key, value, "config.toml").unwrap();
             } else {
                 eprintln!("Error: No value provided for --set");
                 std::process::exit(1);
