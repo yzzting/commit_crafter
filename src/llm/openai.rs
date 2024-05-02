@@ -3,7 +3,8 @@ use serde_json::{json, Value};
 use std::io::{Error, ErrorKind, Result};
 
 use crate::config::{
-    get_config_key, VALID_OPENAI_API_KEY, VALID_OPENAI_MODEL, VALID_OPENAI_URL, VALID_USER_LANGUAGE,
+    get_config_key, get_language, VALID_OPENAI_API_KEY, VALID_OPENAI_MODEL, VALID_OPENAI_URL,
+    VALID_USER_LANGUAGE,
 };
 
 pub fn openai_request(diff_content: &str) -> Result<()> {
@@ -16,13 +17,13 @@ pub fn openai_request(diff_content: &str) -> Result<()> {
     let mut openai_api_key = String::new();
     let mut openai_url = String::new();
     let mut openai_model = String::new();
-    let mut prompt = String::new();
+    let mut user_language = String::new();
     match get_config_key(&keys) {
         Ok(values) => {
             openai_api_key = values[0].clone();
             openai_url = values[1].clone();
             openai_model = values[2].clone();
-            prompt = values[3].clone();
+            user_language = values[3].clone();
         }
         Err(e) => {
             eprintln!("Error: {}", e);
@@ -36,6 +37,7 @@ pub fn openai_request(diff_content: &str) -> Result<()> {
             "OpenAI API key or URL is empty",
         ));
     }
+    let prompt = get_language(user_language.as_str());
     let client = Client::new();
     let response = client
         .post(format!("{}/v1/chat/completions", openai_url))

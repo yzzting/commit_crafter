@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
+use std::fs;
 use std::path::Path;
-use std::{fs, result};
 use toml;
 
 #[derive(Deserialize, Serialize)]
@@ -72,6 +72,20 @@ pub fn set_config_key(key: &str, value: &str) -> Result<(), Box<dyn std::error::
     fs::write("config.toml", new_config).expect("Could not write to config file");
 
     Ok(())
+}
+
+pub fn get_language(user_language: &str) -> String {
+    let prompt_file = fs::read_to_string("prompt.toml").expect("Could not read prompt config file");
+    let prompt_config: PromptConfig =
+        toml::from_str(&prompt_file).expect("Could not parse prompt config file");
+
+    match user_language {
+        "zh" => prompt_config.prompt_zh.clone(),
+        "en" => prompt_config.prompt_en.clone(),
+        "jp" => prompt_config.prompt_jp.clone(),
+        "zh_tw" => prompt_config.prompt_zh_tw.clone(),
+        _ => panic!("Invalid user language"),
+    }
 }
 
 pub fn generate_config_toml() -> String {
