@@ -1,6 +1,6 @@
 extern crate commit_crafter;
 
-use commit_crafter::{config, git_integration, install, llm};
+use commit_crafter::{config, git_integration, install, uninstall, llm};
 
 use clap::{arg, Command};
 
@@ -26,11 +26,20 @@ fn main() {
                         .arg(arg!(<VALUE> "The value to set the key to")),
                 ),
         )
+        .subcommand(
+            Command::new("uninstall")
+                .about("Uninstall the pre-commit hook")
+                .version("0.1.0")
+                .author("ZenYang <yzzting@gmail.com")
+        )
         .get_matches();
 
     match matches.subcommand() {
         Some(("install", _sub_matches)) => {
             let _ = install::install_commit_msg_hook();
+        }
+        Some(("uninstall", _sub_matches)) => {
+            let _ = uninstall::uninstall_commit_msg_hook();
         }
         Some(("config", sub_matches)) => {
             if let Some(set_matches) = sub_matches.subcommand_matches("set") {
