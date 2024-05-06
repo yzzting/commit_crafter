@@ -32,6 +32,12 @@ commit-crafter config set openai_model <your model>
 
 // prompt language
 commit-crafter config set user_language <your language>
+
+// get config options
+commit-crafter config get <option>
+
+// get all config options
+commit-crafter config list
 ```
 
 ## Usage
