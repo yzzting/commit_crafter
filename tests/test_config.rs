@@ -37,3 +37,38 @@ fn test_set_config_key() {
 
     temp_dir.close().unwrap();
 }
+
+#[test]
+fn test_get_config_key() {
+    let temp_dir = tempdir().unwrap();
+    let file_path = temp_dir.path().join("config.toml");
+
+    let config_str = config::generate_config_toml();
+    config::write_config_to_toml(&config_str, &file_path);
+
+    let key = "openai_api_key";
+    let value = config::get_config_key(&[key], &file_path).unwrap();
+    assert_eq!(value, vec![""]);
+
+    temp_dir.close().unwrap();
+}
+
+#[test]
+fn test_list_config_keys() {
+    let temp_dir = tempdir().unwrap();
+    let file_path = temp_dir.path().join("config.toml");
+
+    let config_str = config::generate_config_toml();
+    config::write_config_to_toml(&config_str, &file_path);
+
+    let keys = [
+        "openai_api_key",
+        "openai_url",
+        "openai_model",
+        "user_language",
+    ];
+    let values = config::get_config_key(&keys, &file_path).unwrap();
+    assert_eq!(values, vec!["", "", "", "en"]);
+
+    temp_dir.close().unwrap();
+}
