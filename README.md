@@ -15,7 +15,13 @@ brew install commit-crafter
 In the git project, install the prepare-commit-msg hook and set up the OpenAI API key to use it. If it is the first time installing and using it.
 
 ```bash
-commit-crafter initstall
+commit-crafter install
+```
+
+After executing the installation command, you must first set up a key in order to use it normally.
+
+```bash
+commit-crafter config set openai_api_key <your key>
 ```
 
 ## Options
@@ -40,6 +46,14 @@ commit-crafter config get <option>
 commit-crafter config list
 ```
 
+Language List:
+| Language | Code |
+| --- | --- |
+| English | en |
+| Japanese | jp |
+| 简体中文 | zh |
+| 繁体中文 | zh_tw |
+
 ## Usage
 
 After correctly installing the hook, execute "git commit -a" in the git project. In the temporary Vim editor interface that opens, there will be generated commit information. The prerequisite is that all files have been staged for commit.
@@ -58,5 +72,5 @@ git commit -a
 - [ ] Add more options to customize the commit message
 - [ ] Support more AI models
 - [ ] Support more languages
-- [ ] Add more tests
+- [X] Add more tests
 - [ ] Improve README.md
