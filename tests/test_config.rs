@@ -6,7 +6,7 @@ use tempfile::tempdir;
 fn test_generate_config_toml() {
     let toml_str = config::generate_config_toml();
     assert!(toml_str.contains("openai_api_key = \"\""));
-    assert!(toml_str.contains("openai_url = \"\""));
+    assert!(toml_str.contains("openai_url = \"https://api.openai.com\""));
     assert!(toml_str.contains("openai_model = \"\""));
     assert!(toml_str.contains("user_language = \"en\""));
 }
@@ -68,7 +68,7 @@ fn test_list_config_keys() {
         "user_language",
     ];
     let values = config::get_config_key(&keys, &file_path).unwrap();
-    assert_eq!(values, vec!["", "", "", "en"]);
+    assert_eq!(values, vec!["", "https://api.openai.com", "", "en"]);
 
     temp_dir.close().unwrap();
 }
