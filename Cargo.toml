@@ -2,7 +2,13 @@
 name = "commit_crafter"
 version = "0.1.0"
 edition = "2021"
-
+authors = ["ZenYang <yzzting@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/yzzting/commit_crafter"
+repository = "https://github.com/yzzting/commit_crafter"
+keywords = ["git", "commit-message", "ai", "nlp", "productivity"]
+categories = ["external-tools", "text-processing", "development-tools::version-control"]
 description = "AI powered tool for Git commit message generator"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
