@@ -48,6 +48,8 @@ Language List:
 | 简体中文 | zh |
 | 繁体中文 | zh_tw |
 
+The default file path is $HOME/.config/commit_crafter/config.toml
+
 ## Usage
 
 After correctly installing the hook, execute "git commit -a" in the git project. In the temporary Vim editor interface that opens, there will be generated commit information. The prerequisite is that all files have been staged for commit.
