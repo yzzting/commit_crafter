@@ -3,47 +3,41 @@
 ## Installation
 
 ```bash
-cargo install --locked commit-crafter
-```
-
-use homebrew
-
-```bash
-brew install commit-crafter
+cargo install --locked commit_crafter
 ```
 
 In the git project, install the prepare-commit-msg hook and set up the OpenAI API key to use it. If it is the first time installing and using it.
 
 ```bash
-commit-crafter install
+commit_crafter install
 ```
 
 After executing the installation command, you must first set up a key in order to use it normally.
 
 ```bash
-commit-crafter config set openai_api_key <your key>
+commit_crafter config set openai_api_key <your key>
 ```
 
 ## Options
 
 ```bash
 // openai api key
-commit-crafter config set openai_api_key <your key>
+commit_crafter config set openai_api_key <your key>
 
 // openai url
-commit-crafter config set openai_url <your url>
+commit_crafter config set openai_url <your url>
 
 // openai model
-commit-crafter config set openai_model <your model>
+commit_crafter config set openai_model <your model>
 
 // prompt language
-commit-crafter config set user_language <your language>
+commit_crafter config set user_language <your language>
 
 // get config options
-commit-crafter config get <option>
+commit_crafter config get <option>
 
 // get all config options
-commit-crafter config list
+commit_crafter config list
 ```
 
 Language List:
