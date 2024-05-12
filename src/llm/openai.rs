@@ -18,7 +18,9 @@ pub fn openai_request(diff_content: &str, path: &str) -> Result<()> {
     let mut openai_url = String::new();
     let mut openai_model = String::new();
     let mut user_language = String::new();
-    match get_config_key(&keys, path) {
+    let config_dir = format!("{}/config.toml", path);
+    let prompt = format!("{}/prompt.toml", path);
+    match get_config_key(&keys, config_dir) {
         Ok(values) => {
             openai_api_key = values[0].clone();
             openai_url = values[1].clone();
@@ -37,7 +39,7 @@ pub fn openai_request(diff_content: &str, path: &str) -> Result<()> {
             "OpenAI API key or URL is empty",
         ));
     }
-    let prompt = get_language(user_language.as_str());
+    let prompt = get_language(user_language.as_str(), prompt);
     let client = Client::new();
     let response = client
         .post(format!("{}/v1/chat/completions", openai_url))

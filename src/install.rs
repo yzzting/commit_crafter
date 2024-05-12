@@ -3,7 +3,7 @@ use std::fs::{self, File};
 use std::io::{self, Error, ErrorKind, Result, Write};
 use std::path::Path;
 
-use crate::config::{generate_config_toml, write_config_to_toml};
+use crate::config::{generate_config_toml, move_prompt_toml, write_config_to_toml};
 
 pub fn install_commit_msg_hook() -> Result<()> {
     let git_dir = Path::new(".git");
@@ -24,6 +24,12 @@ pub fn install_commit_msg_hook() -> Result<()> {
             eprintln!("Failed to write default config.toml: {}", e);
             return Err(e);
         }
+    }
+
+    let prompt_toml = config_dir.join("prompt.toml");
+    if !prompt_toml.exists() {
+        println!("Warn: prompt.toml not found. Start generating default files.");
+        move_prompt_toml(&prompt_toml);
     }
 
     let current_exe_path = env::current_exe()

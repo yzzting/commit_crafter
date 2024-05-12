@@ -79,8 +79,8 @@ pub fn set_config_key<P: AsRef<Path> + Clone>(
     Ok(())
 }
 
-pub fn get_language(user_language: &str) -> String {
-    let prompt_file = fs::read_to_string("prompt.toml").expect("Could not read prompt config file");
+pub fn get_language<P: AsRef<Path> + Clone>(user_language: &str, path: P) -> String {
+    let prompt_file = fs::read_to_string(path).expect("Could not read prompt config file");
     let prompt_config: PromptConfig =
         toml::from_str(&prompt_file).expect("Could not parse prompt config file");
 
@@ -91,6 +91,10 @@ pub fn get_language(user_language: &str) -> String {
         "zh_tw" => prompt_config.prompt_zh_tw.clone(),
         _ => panic!("Invalid user language"),
     }
+}
+
+pub fn move_prompt_toml<P: AsRef<Path> + Clone>(path: P) {
+    fs::copy("prompt.toml", path).expect("Could not move prompt.toml");
 }
 
 pub fn generate_config_toml() -> String {

@@ -57,7 +57,7 @@ fn main() {
                     eprintln!("Error: No changes to commit");
                     std::process::exit(1);
                 }
-                let config_dir = get_config_dir();
+                let config_dir = get_config_dir("");
                 llm::openai::openai_request(&output, &config_dir).unwrap();
             }
             Err(e) => eprintln!("Error: {}", e),
@@ -66,13 +66,15 @@ fn main() {
     }
 }
 
-fn get_config_dir() -> String {
+fn get_config_dir(config_url: &str) -> String {
     let home_dir = env::var("HOME").expect("Error getting home directory");
-    format!("{}/.config/commit_crafter/config.toml", home_dir)
+    let config_dir = format!("{}/.config/commit_crafter", home_dir);
+    let full_config_dir = format!("{}/{}", config_dir, config_url);
+    full_config_dir 
 }
 
 fn handle_config_subcommand(sub_matches: &clap::ArgMatches) {
-    let config_dir = get_config_dir();
+    let config_dir = get_config_dir("config.toml");
     match sub_matches.subcommand() {
         Some(("set", matches)) => {
             let key = matches
