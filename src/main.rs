@@ -1,4 +1,5 @@
 extern crate commit_crafter;
+use std::env;
 
 use commit_crafter::{config, git_integration, install, llm, uninstall};
 
@@ -56,7 +57,8 @@ fn main() {
                     eprintln!("Error: No changes to commit");
                     std::process::exit(1);
                 }
-                llm::openai::openai_request(&output, "config.toml").unwrap();
+                let config_dir = get_config_dir();
+                llm::openai::openai_request(&output, &config_dir).unwrap();
             }
             Err(e) => eprintln!("Error: {}", e),
         },
@@ -64,7 +66,13 @@ fn main() {
     }
 }
 
+fn get_config_dir() -> String {
+    let home_dir = env::var("HOME").expect("Error getting home directory");
+    format!("{}/.config/commit_crafter/config.toml", home_dir)
+}
+
 fn handle_config_subcommand(sub_matches: &clap::ArgMatches) {
+    let config_dir = get_config_dir();
     match sub_matches.subcommand() {
         Some(("set", matches)) => {
             let key = matches
@@ -73,13 +81,13 @@ fn handle_config_subcommand(sub_matches: &clap::ArgMatches) {
             let value = matches
                 .get_one::<String>("VALUE")
                 .expect("Required VALUE missing");
-            config::set_config_key(key, value, "config.toml").expect("Failed to set configuration");
+            config::set_config_key(key, value, &config_dir).expect("Failed to set configuration");
         }
         Some(("get", matches)) => {
             let key = matches
                 .get_one::<String>("KEY")
                 .expect("Required KEY missing");
-            let value = config::get_config_key(&[key.as_str()], "config.toml")
+            let value = config::get_config_key(&[key.as_str()], &config_dir)
                 .expect("Failed to get configuration")
                 .join("\n");
             println!("{}", value);
@@ -91,8 +99,8 @@ fn handle_config_subcommand(sub_matches: &clap::ArgMatches) {
                 "openai_model",
                 "user_language",
             ];
-            let values = config::get_config_key(&keys, "config.toml")
-                .expect("Failed to list configurations");
+            let values =
+                config::get_config_key(&keys, &config_dir).expect("Failed to list configurations");
             for (key, value) in keys.iter().zip(values.iter()) {
                 println!("{}: {}", key, value);
             }

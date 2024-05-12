@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::io::Error;
 use std::path::Path;
 use toml;
 
@@ -102,6 +103,7 @@ pub fn generate_config_toml() -> String {
     toml::to_string(&config).expect("Could not serialize config")
 }
 
-pub fn write_config_to_toml(config_toml: &str, path: &Path) {
+pub fn write_config_to_toml(config_toml: &str, path: &Path) -> Result<(), Error> {
     fs::write(path, config_toml).expect("Could not write to config file");
+    Ok(())
 }

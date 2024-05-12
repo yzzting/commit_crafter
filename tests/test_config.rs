@@ -16,7 +16,9 @@ fn test_write_config_toml() {
     let temp_dir = tempdir().unwrap();
     let file_path = temp_dir.path().join("config.toml");
     let config_str = config::generate_config_toml();
-    config::write_config_to_toml(&config_str, &file_path);
+    if let Err(e) = config::write_config_to_toml(&config_str, &file_path) {
+        eprintln!("Failed to write config.toml: {}", e);
+    }
 
     let write_content = fs::read_to_string(&file_path).unwrap();
     assert_eq!(config_str, write_content);
@@ -28,7 +30,9 @@ fn test_set_config_key() {
     let file_path = temp_dir.path().join("config.toml");
 
     let config_str = config::generate_config_toml();
-    config::write_config_to_toml(&config_str, &file_path);
+    if let Err(e) = config::write_config_to_toml(&config_str, &file_path) {
+        eprintln!("Failed to write config.toml: {}", e);
+    }
 
     config::set_config_key("openai_api_key", "test_key", &file_path).unwrap();
 
@@ -44,7 +48,9 @@ fn test_get_config_key() {
     let file_path = temp_dir.path().join("config.toml");
 
     let config_str = config::generate_config_toml();
-    config::write_config_to_toml(&config_str, &file_path);
+    if let Err(e) = config::write_config_to_toml(&config_str, &file_path) {
+        eprintln!("Failed to write config.toml: {}", e);
+    }
 
     let key = "openai_api_key";
     let value = config::get_config_key(&[key], &file_path).unwrap();
@@ -59,7 +65,9 @@ fn test_list_config_keys() {
     let file_path = temp_dir.path().join("config.toml");
 
     let config_str = config::generate_config_toml();
-    config::write_config_to_toml(&config_str, &file_path);
+    if let Err(e) = config::write_config_to_toml(&config_str, &file_path) {
+        eprintln!("Failed to write config.toml: {}", e);
+    }
 
     let keys = [
         "openai_api_key",

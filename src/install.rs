@@ -1,5 +1,5 @@
 use std::env;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, Error, ErrorKind, Result, Write};
 use std::path::Path;
 
@@ -12,11 +12,18 @@ pub fn install_commit_msg_hook() -> Result<()> {
         return Err(Error::new(ErrorKind::NotFound, "Not a git repository"));
     }
 
-    let config_toml = Path::new("config.toml");
+    let home_dir = env::var("HOME").expect("Error getting home directory");
+    let config_dir = Path::new(&home_dir).join(".config/commit_crafter");
+    let config_dif_clone = config_dir.clone();
+    fs::create_dir_all(config_dif_clone).expect("Error creating config directory");
+    let config_toml = config_dir.join("config.toml");
     if !config_toml.exists() {
         println!("Error: config.toml not found. Start generating default files.");
         let config_str = generate_config_toml();
-        write_config_to_toml(&config_str, config_toml)
+        if let Err(e) = write_config_to_toml(&config_str, &config_toml) {
+            eprintln!("Failed to write default config.toml: {}", e);
+            return Err(e);
+        }
     }
 
     let current_exe_path = env::current_exe()
