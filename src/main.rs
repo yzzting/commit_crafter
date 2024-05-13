@@ -7,19 +7,19 @@ use clap::{arg, Command};
 
 fn main() {
     let matches = Command::new("commit crafter")
-        .version("0.1.0")
-        .author("ZenYang <yzzting@gmail.com")
+        .version(env!("CARGO_PKG_VERSION"))
+        .author(env!("CARGO_PKG_AUTHORS"))
         .subcommand(
             Command::new("install")
                 .about("Install the pre-commit hook")
-                .version("0.1.0")
-                .author("ZenYang <yzzting@gmail.com>"),
+                .version(env!("CARGO_PKG_VERSION"))
+                .author(env!("CARGO_PKG_AUTHORS"))
         )
         .subcommand(
             Command::new("config")
                 .about("Configure settings")
-                .version("0.1.0")
-                .author("ZenYang <yzzting@gmail.com>")
+                .version(env!("CARGO_PKG_VERSION"))
+                .author(env!("CARGO_PKG_AUTHORS"))
                 .subcommand(
                     Command::new("set")
                         .about("Set a configuration option")
@@ -36,8 +36,8 @@ fn main() {
         .subcommand(
             Command::new("uninstall")
                 .about("Uninstall the pre-commit hook")
-                .version("0.1.0")
-                .author("ZenYang <yzzting@gmail.com"),
+                .version(env!("CARGO_PKG_VERSION"))
+                .author(env!("CARGO_PKG_AUTHORS"))
         )
         .get_matches();
 
