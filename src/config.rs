@@ -25,6 +25,11 @@ pub const VALID_OPENAI_URL: &str = "openai_url";
 pub const VALID_OPENAI_MODEL: &str = "openai_model";
 pub const VALID_USER_LANGUAGE: &str = "user_language";
 
+const PROMPT_ZH: &str = "根据以下的git差异内容，生成一个简洁的提交信息。根据更改的性质，以以下其中一个前缀开头：'build'（构建系统），'chore'（杂务），'ci'（持续集成），'docs'（文档），'feat'（新功能），'fix'（修复），'perf'（性能），'refactor'（重构），'style'（样式），'test'（测试）：";
+const PROMPT_EN: &str = "Based on the following git diff content, generate a concise commit message. Start with one of the following prefixes according to the nature of the change: 'build' (build system), 'chore' (miscellaneous), 'ci' (continuous integration), 'docs' (documentation), 'feat' (new feature), 'fix' (fix), 'perf' (performance), 'refactor' (refactor), 'style' (style), 'test' (test):";
+const PROMPT_JP: &str = "以下のgitの差分内容に基づいて、簡潔なコミットメッセージを生成します。変更の性質に応じて、次の接頭辞のいずれかで始めます：'build'（ビルドシステム）、'chore'（その他）、'ci'（継続的統合）、'docs'（ドキュメント）、'feat'（新機能）、'fix'（修正）、'perf'（パフォーマンス）、'refactor'（リファクタリング）、'style'（スタイル）、'test'（テスト）：";
+const PROMPT_ZH_TW: &str = "根據以下的git差異內容，生成一個簡潔的提交信息。根據更改的性質，以以下其中一個前綴開頭：'build'（構建系統），'chore'（雜務），'ci'（持續集成），'docs'（文檔），'feat'（新功能），'fix'（修復），'perf'（性能），'refactor'（重構），'style'（樣式），'test'（測試）：";
+
 pub fn validate_config_key(key: &str) -> Result<&str, &'static str> {
     match key {
         VALID_OPENAI_API_KEY | VALID_OPENAI_URL | VALID_OPENAI_MODEL => Ok(key),
@@ -94,7 +99,14 @@ pub fn get_language<P: AsRef<Path> + Clone>(user_language: &str, path: P) -> Str
 }
 
 pub fn move_prompt_toml<P: AsRef<Path> + Clone>(path: P) {
-    fs::copy("prompt.toml", path).expect("Could not move prompt.toml");
+    let prompt_config = PromptConfig {
+        prompt_zh: PROMPT_ZH.to_string(),
+        prompt_en: PROMPT_EN.to_string(),
+        prompt_jp: PROMPT_JP.to_string(),
+        prompt_zh_tw: PROMPT_ZH_TW.to_string(),
+    };
+    let prompt_toml = toml::to_string(&prompt_config).expect("Could not serialize prompt config");
+    fs::write(path, prompt_toml).expect("Could not write to prompt config file");
 }
 
 pub fn generate_config_toml() -> String {
