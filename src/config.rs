@@ -113,7 +113,7 @@ pub fn generate_config_toml() -> String {
     let config = Config {
         openai_api_key: "".to_string(),
         openai_url: "https://api.openai.com".to_string(),
-        openai_model: "".to_string(),
+        openai_model: "gpt-4o-mini".to_string(),
         user_language: "en".to_string(),
     };
     toml::to_string(&config).expect("Could not serialize config")
