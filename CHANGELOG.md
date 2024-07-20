@@ -13,3 +13,7 @@
 ## v0.1.3
 
 fix: Counld not move prompt.toml [issue #1](https://github.com/yzzting/commit_crafter/issues/1)
+
+## v0.1.4
+
+feat: update default OpenAI model to gpt-4o-mini in configuration
