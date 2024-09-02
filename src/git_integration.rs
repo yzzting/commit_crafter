@@ -1,7 +1,7 @@
 use std::io::{self, ErrorKind};
 use std::process::Command;
 
-fn exclude_from_diff(path: &str) -> String {
+pub fn exclude_from_diff(path: &str) -> String {
     format!(":(exclude){}", path)
 }
 
@@ -9,7 +9,7 @@ pub fn run_git_diff() -> Result<String, io::Error> {
     let files_to_exclude = vec![
         "Cargo.lock",
         "pakcage-lock.json",
-        "pnpm-lock.json",
+        "pnpm-lock.yaml",
         "*.lock",
     ];
 

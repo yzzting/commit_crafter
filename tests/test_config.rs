@@ -1,4 +1,4 @@
-use commit_crafter::config;
+use commit_crafter::{config, git_integration};
 use std::fs;
 use tempfile::tempdir;
 
@@ -79,4 +79,28 @@ fn test_list_config_keys() {
     assert_eq!(values, vec!["", "https://api.openai.com", "", "en"]);
 
     temp_dir.close().unwrap();
+}
+
+#[test]
+fn test_exclude_path() {
+    let files_to_exclude = vec![
+        "Cargo.lock",
+        "pakcage-lock.json",
+        "pnpm-lock.yaml",
+        "*.lock",
+    ];
+
+    let exclude_path: Vec<String> = files_to_exclude
+        .iter()
+        .map(|path| git_integration::exclude_from_diff(path))
+        .collect();
+
+    let expected_exclude_path = vec![
+        ":(exclude)Cargo.lock",
+        ":(exclude)pakcage-lock.json",
+        ":(exclude)pnpm-lock.yaml",
+        ":(exclude)*.lock",
+    ];
+
+    assert_eq!(exclude_path, expected_exclude_path);
 }
