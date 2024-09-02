@@ -7,7 +7,7 @@ fn test_generate_config_toml() {
     let toml_str = config::generate_config_toml();
     assert!(toml_str.contains("openai_api_key = \"\""));
     assert!(toml_str.contains("openai_url = \"https://api.openai.com\""));
-    assert!(toml_str.contains("openai_model = \"\""));
+    assert!(toml_str.contains("openai_model = \"gpt-4o-mini\""));
     assert!(toml_str.contains("user_language = \"en\""));
 }
 
