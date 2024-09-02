@@ -76,7 +76,7 @@ fn test_list_config_keys() {
         "user_language",
     ];
     let values = config::get_config_key(&keys, &file_path).unwrap();
-    assert_eq!(values, vec!["", "https://api.openai.com", "", "en"]);
+    assert_eq!(values, vec!["", "https://api.openai.com", "gpt-4o-mini", "en"]);
 
     temp_dir.close().unwrap();
 }
