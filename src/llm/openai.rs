@@ -7,7 +7,7 @@ use crate::config::{
     VALID_USER_LANGUAGE,
 };
 
-pub fn openai_request(diff_content: &str, path: &str) -> Result<()> {
+pub fn openai_request(diff_content: &str, commit_history: &[String], path: &str) -> Result<()> {
     let keys = [
         VALID_OPENAI_API_KEY,
         VALID_OPENAI_URL,
@@ -39,7 +39,22 @@ pub fn openai_request(diff_content: &str, path: &str) -> Result<()> {
             "OpenAI API key or URL is empty",
         ));
     }
-    let prompt = get_language(user_language.as_str(), prompt);
+    let base_prompt = get_language(user_language.as_str(), prompt);
+
+    // build user message with recent commit messages
+    let mut user_message = String::new();
+
+    if !commit_history.is_empty() {
+        user_message.push_str("Recent commit messages for reference:\n");
+        for (i, commit) in commit_history.iter().enumerate() {
+            user_message.push_str(&format!("{}. {}\n", i + 1, commit));
+        }
+        user_message.push_str("\n---\n\n");
+    }
+
+    user_message.push_str("Git diff content:\n");
+    user_message.push_str(diff_content);
+
     let client = Client::new();
     let response = client
         .post(format!("{}/v1/chat/completions", openai_url))
@@ -49,11 +64,11 @@ pub fn openai_request(diff_content: &str, path: &str) -> Result<()> {
             "messages": [
                 {
                     "role": "system",
-                    "content": prompt
+                    "content": base_prompt
                 },
                 {
                     "role": "user",
-                    "content": diff_content
+                    "content": user_message
                 }
             ],
             "max_tokens": 60

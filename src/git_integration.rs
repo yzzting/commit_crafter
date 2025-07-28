@@ -50,3 +50,34 @@ pub fn run_git_diff() -> Result<String, io::Error> {
         Err(e) => Err(e),
     }
 }
+
+pub fn get_recent_commits(count: usize) -> Result<Vec<String>, io::Error> {
+    let command = Command::new("git")
+        .args(&["log", &format!("-{}", count), "--pretty=format:%s"])
+        .output();
+
+    match command {
+        Ok(output) if output.status.success() => match String::from_utf8(output.stdout) {
+            Ok(output_str) => {
+                let commits: Vec<String> = output_str
+                    .lines()
+                    .map(|line| line.trim().to_string())
+                    .filter(|line| !line.is_empty())
+                    .collect();
+                Ok(commits)
+            }
+            Err(e) => Err(io::Error::new(
+                ErrorKind::InvalidData,
+                format!("Output is not valid UTF-8: {}", e),
+            )),
+        },
+        Ok(output) => {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            Err(io::Error::new(
+                ErrorKind::Other,
+                format!("Error getting recent commits: {}", stderr),
+            ))
+        }
+        Err(e) => Err(e),
+    }
+}
