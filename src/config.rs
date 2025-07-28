@@ -25,10 +25,13 @@ pub const VALID_OPENAI_URL: &str = "openai_url";
 pub const VALID_OPENAI_MODEL: &str = "openai_model";
 pub const VALID_USER_LANGUAGE: &str = "user_language";
 
-const PROMPT_ZH: &str = "根据以下的git差异内容，生成一个简洁的提交信息。根据更改的性质，以以下其中一个前缀开头：'build'（构建系统），'chore'（杂务），'ci'（持续集成），'docs'（文档），'feat'（新功能），'fix'（修复），'perf'（性能），'refactor'（重构），'style'（样式），'test'（测试）：";
-const PROMPT_EN: &str = "Based on the following git diff content, generate a concise commit message. Start with one of the following prefixes according to the nature of the change: 'build' (build system), 'chore' (miscellaneous), 'ci' (continuous integration), 'docs' (documentation), 'feat' (new feature), 'fix' (fix), 'perf' (performance), 'refactor' (refactor), 'style' (style), 'test' (test):";
-const PROMPT_JP: &str = "以下のgitの差分内容に基づいて、簡潔なコミットメッセージを生成します。変更の性質に応じて、次の接頭辞のいずれかで始めます：'build'（ビルドシステム）、'chore'（その他）、'ci'（継続的統合）、'docs'（ドキュメント）、'feat'（新機能）、'fix'（修正）、'perf'（パフォーマンス）、'refactor'（リファクタリング）、'style'（スタイル）、'test'（テスト）：";
-const PROMPT_ZH_TW: &str = "根據以下的git差異內容，生成一個簡潔的提交信息。根據更改的性質，以以下其中一個前綴開頭：'build'（構建系統），'chore'（雜務），'ci'（持續集成），'docs'（文檔），'feat'（新功能），'fix'（修復），'perf'（性能），'refactor'（重構），'style'（樣式），'test'（測試）：";
+const PROMPT_ZH: &str = "请根据以下git diff内容，结合最近5条提交信息，生成一条风格一致、语言纯正的简洁Git提交信息。请仅用简体中文描述，避免中英混用。根据本次更改的性质，从以下前缀中选择一个开头：'build'（构建系统）、'chore'（杂务）、'ci'（持续集成）、'docs'（文档）、'feat'（新功能）、'fix'（修复）、'perf'（性能）、'refactor'（重构）、'style'（样式）、'test'（测试）。提交信息应重点突出本次更改的核心目的和影响，避免冗长和无关细节。示例：\n\nfeat: 支持多语言提交信息生成\nfix: 修复API密钥配置无法保存的问题\n\n请生成一条与上文风格一致的提交信息：";
+
+const PROMPT_EN: &str = "Based on the following git diff content and the last 5 commit messages, generate a concise and stylistically consistent Git commit message. Only use English; avoid mixing languages. Start the message with one of these prefixes according to the nature of the change: 'build' (build system), 'chore' (miscellaneous), 'ci' (continuous integration), 'docs' (documentation), 'feat' (new feature), 'fix' (fix), 'perf' (performance), 'refactor' (refactor), 'style' (style), 'test' (test). The message should clearly state the main purpose and impact of this change, without unnecessary details. For example:\n\nfeat: add multi-language commit message support\nfix: resolve issue with API key configuration not saving\n\nPlease generate a message matching the above style:";
+
+const PROMPT_JP: &str = "以下のgitの差分内容と直近5件のコミットメッセージを参考に、統一感のある簡潔なGitコミットメッセージを日本語のみで生成してください（他言語を混ぜない）。変更内容に応じて、次のいずれかの接頭辞で始めてください：'build'（ビルドシステム）、'chore'（その他）、'ci'（継続的インテグレーション）、'docs'（ドキュメント）、'feat'（新機能）、'fix'（修正）、'perf'（パフォーマンス）、'refactor'（リファクタリング）、'style'（スタイル）、'test'（テスト）。変更の主旨と影響を簡潔に伝え、冗長な説明や不要な詳細は避けてください。例：\n\nfeat: 多言語コミットメッセージ生成をサポート\nfix: APIキー設定が保存できない問題を修正\n\n上記のスタイルに合わせてコミットメッセージを生成してください：";
+
+const PROMPT_ZH_TW: &str = "請根據以下git差異內容，以及最近5筆提交訊息，生成一條風格一致、語言純正且精簡的Git提交訊息。請只用繁體中文描述，避免中英混合。根據此次更改的性質，從下列前綴選擇一個作為開頭：'build'（構建系統）、'chore'（雜務）、'ci'（持續整合）、'docs'（文件）、'feat'（新功能）、'fix'（修復）、'perf'（效能）、'refactor'（重構）、'style'（樣式）、'test'（測試）。訊息需明確說明此更動的主要目的與影響，避免冗長或無關資訊。範例：\n\nfeat: 支援多語言提交訊息生成\nfix: 修正API金鑰設定無法儲存的問題\n\n請產生一條符合上述風格的提交訊息：";
 
 pub fn validate_config_key(key: &str) -> Result<&str, &'static str> {
     match key {
