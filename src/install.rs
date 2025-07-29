@@ -1,9 +1,42 @@
+use std::collections::hash_map::DefaultHasher;
 use std::env;
-use std::fs::{self, File};
+use std::fs::File;
+use std::hash::{Hash, Hasher};
 use std::io::{self, Error, ErrorKind, Result, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-use crate::config::{generate_config_toml, move_prompt_toml, write_config_to_toml};
+use crate::config::ensure_config_initialized;
+use crate::git_integration;
+
+fn get_project_config_dir() -> io::Result<PathBuf> {
+    let home_dir = env::var("HOME").expect("Error getting home directory");
+    let base_config_dir = format!("{}/.config/commit_crafter", home_dir);
+
+    // Try to get git root directory for project-specific config
+    match git_integration::get_git_root_dir() {
+        Ok(git_root) => {
+            // Create a hash of the git root path to create a unique config directory for this project
+            let mut hasher = DefaultHasher::new();
+            git_root.hash(&mut hasher);
+            let project_hash = hasher.finish();
+
+            let project_name = git_root
+                .file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or("unknown");
+
+            let project_config_dir = format!(
+                "{}/projects/{}-{:x}",
+                base_config_dir, project_name, project_hash
+            );
+            Ok(PathBuf::from(project_config_dir))
+        }
+        Err(e) => Err(Error::new(
+            ErrorKind::NotFound,
+            format!("Failed to get git root: {}", e),
+        )),
+    }
+}
 
 pub fn install_commit_msg_hook() -> Result<()> {
     let git_dir = Path::new(".git");
@@ -12,24 +45,28 @@ pub fn install_commit_msg_hook() -> Result<()> {
         return Err(Error::new(ErrorKind::NotFound, "Not a git repository"));
     }
 
-    let home_dir = env::var("HOME").expect("Error getting home directory");
-    let config_dir = Path::new(&home_dir).join(".config/commit_crafter");
-    let config_dif_clone = config_dir.clone();
-    fs::create_dir_all(config_dif_clone).expect("Error creating config directory");
-    let config_toml = config_dir.join("config.toml");
-    if !config_toml.exists() {
-        println!("Error: config.toml not found. Start generating default files.");
-        let config_str = generate_config_toml();
-        if let Err(e) = write_config_to_toml(&config_str, &config_toml) {
-            eprintln!("Failed to write default config.toml: {}", e);
-            return Err(e);
+    // Try to get project-specific config directory, fallback to global if failed
+    let config_dir = match get_project_config_dir() {
+        Ok(dir) => {
+            println!("Using project-specific config directory: {}", dir.display());
+            dir
         }
-    }
+        Err(e) => {
+            eprintln!("Warning: Failed to get project config directory: {}", e);
+            eprintln!("Falling back to global config directory");
+            let home_dir = env::var("HOME").expect("Error getting home directory");
+            let global_config_dir = format!("{}/.config/commit_crafter/global", home_dir);
+            PathBuf::from(global_config_dir)
+        }
+    };
 
-    let prompt_toml = config_dir.join("prompt.toml");
-    if !prompt_toml.exists() {
-        println!("Warn: prompt.toml not found. Start generating default files.");
-        move_prompt_toml(&prompt_toml);
+    // Initialize config
+    if let Err(e) = ensure_config_initialized(&config_dir) {
+        eprintln!("Error: Failed to initialize config: {}", e);
+        return Err(Error::new(
+            ErrorKind::Other,
+            format!("Config initialization failed: {}", e),
+        ));
     }
 
     let current_exe_path = env::current_exe()
@@ -88,6 +125,9 @@ echo "$COMMIT_MSG" > $1
         file.set_permissions(permissions)
             .expect("Error setting file permissions");
     }
+
+    println!("Installed prepare-commit-msg hook successfully!");
+    println!("Config directory: {}", config_dir.display());
 
     Ok(())
 }

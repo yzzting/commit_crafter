@@ -28,6 +28,32 @@ fn test_get_recent_commits() {
 }
 
 #[test]
+fn test_get_git_root_dir() {
+    if env::var("GITHUB_ACTIONS").is_ok() {
+        eprintln!("Skipping test in GitHub Actions environment");
+        return;
+    }
+
+    // 测试获取git仓库根目录
+    let result = git_integration::get_git_root_dir();
+
+    match result {
+        Ok(root_path) => {
+            // 验证返回的路径存在且是目录
+            assert!(root_path.exists());
+            assert!(root_path.is_dir());
+            // 验证这个目录包含.git目录
+            let git_dir = root_path.join(".git");
+            assert!(git_dir.exists());
+        }
+        Err(e) => {
+            eprintln!("Warning: Could not get git root directory: {}", e);
+            // 在非git仓库中运行测试时，这是预期的行为
+        }
+    }
+}
+
+#[test]
 fn test_get_recent_commits_with_zero_count() {
     if env::var("GITHUB_ACTIONS").is_ok() {
         eprintln!("Skipping test in GitHub Actions environment");

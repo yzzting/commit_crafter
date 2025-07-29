@@ -73,13 +73,27 @@ pub fn set_config_key<P: AsRef<Path> + Clone>(
     let config_file = fs::read_to_string(path.as_ref()).expect("Could not read config file");
     let mut config: Config = toml::from_str(&config_file).expect("Could not parse config file");
 
-    let key = validate_config_key(key).expect("Invalid configuration key");
+    let key = match validate_config_key(key) {
+        Ok(valid_key) => valid_key,
+        Err(e) => {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                e,
+            )))
+        }
+    };
+
     match key {
         VALID_OPENAI_API_KEY => config.openai_api_key = value.to_string(),
         VALID_OPENAI_URL => config.openai_url = value.to_string(),
         VALID_OPENAI_MODEL => config.openai_model = value.to_string(),
         VALID_USER_LANGUAGE => config.user_language = value.to_string(),
-        _ => panic!("Invalid configuration key"),
+        _ => {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Invalid configuration key",
+            )))
+        }
     }
     let new_config = toml::to_string(&config).expect("Could not serialize config");
     fs::write(path, new_config).expect("Could not write to config file");
@@ -124,5 +138,37 @@ pub fn generate_config_toml() -> String {
 
 pub fn write_config_to_toml(config_toml: &str, path: &Path) -> Result<(), Error> {
     fs::write(path, config_toml).expect("Could not write to config file");
+    Ok(())
+}
+
+pub fn ensure_config_initialized<P: AsRef<Path>>(
+    config_dir: P,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let config_dir_path = config_dir.as_ref();
+    let config_file_path = config_dir_path.join("config.toml");
+    let prompt_file_path = config_dir_path.join("prompt.toml");
+
+    // Ensure the directory exists
+    fs::create_dir_all(config_dir_path)?;
+
+    // Initialize config.toml if it doesn't exist
+    if !config_file_path.exists() {
+        let default_config = generate_config_toml();
+        fs::write(&config_file_path, default_config)?;
+        println!(
+            "Created new project config at: {}",
+            config_file_path.display()
+        );
+    }
+
+    // Initialize prompt.toml if it doesn't exist
+    if !prompt_file_path.exists() {
+        move_prompt_toml(&prompt_file_path);
+        println!(
+            "Created new prompt config at: {}",
+            prompt_file_path.display()
+        );
+    }
+
     Ok(())
 }

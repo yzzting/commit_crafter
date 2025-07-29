@@ -1,5 +1,9 @@
 extern crate commit_crafter;
+use std::collections::hash_map::DefaultHasher;
 use std::env;
+use std::fs;
+use std::hash::{Hash, Hasher};
+use std::path::Path;
 
 use commit_crafter::{config, git_integration, install, llm, uninstall};
 
@@ -59,6 +63,11 @@ fn main() {
                 }
                 let config_dir = get_config_dir("");
 
+                // Initialize config if needed
+                if let Err(e) = config::ensure_config_initialized(&config_dir) {
+                    eprintln!("Warning: Failed to initialize config: {}", e);
+                }
+
                 // get recent 5 commit messages as reference
                 let commit_history = match git_integration::get_recent_commits(5) {
                     Ok(commits) => commits,
@@ -77,13 +86,57 @@ fn main() {
 
 fn get_config_dir(config_url: &str) -> String {
     let home_dir = env::var("HOME").expect("Error getting home directory");
-    let config_dir = format!("{}/.config/commit_crafter", home_dir);
-    let full_config_dir = format!("{}/{}", config_dir, config_url);
-    full_config_dir
+    let base_config_dir = format!("{}/.config/commit_crafter", home_dir);
+
+    // Try to get git root directory for project-specific config
+    match git_integration::get_git_root_dir() {
+        Ok(git_root) => {
+            // Create a hash of the git root path to create a unique config directory for this project
+            let mut hasher = DefaultHasher::new();
+            git_root.hash(&mut hasher);
+            let project_hash = hasher.finish();
+
+            let project_name = git_root
+                .file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or("unknown");
+
+            let project_config_dir = format!(
+                "{}/projects/{}-{:x}",
+                base_config_dir, project_name, project_hash
+            );
+
+            // Create project config directory if it doesn't exist
+            if let Err(e) = fs::create_dir_all(&project_config_dir) {
+                eprintln!("Warning: Failed to create project config directory: {}", e);
+                eprintln!("Falling back to global config directory");
+                // Fall back to global config
+                let global_config_dir = format!("{}/global", base_config_dir);
+                let _ = fs::create_dir_all(&global_config_dir);
+                format!("{}/{}", global_config_dir, config_url)
+            } else {
+                format!("{}/{}", project_config_dir, config_url)
+            }
+        }
+        Err(_) => {
+            // Not in a git repository, use global config
+            let global_config_dir = format!("{}/global", base_config_dir);
+            let _ = fs::create_dir_all(&global_config_dir);
+            format!("{}/{}", global_config_dir, config_url)
+        }
+    }
 }
 
 fn handle_config_subcommand(sub_matches: &clap::ArgMatches) {
     let config_dir = get_config_dir("config.toml");
+    let config_dir_path = Path::new(&config_dir).parent().unwrap();
+
+    // Initialize config if needed
+    if let Err(e) = config::ensure_config_initialized(config_dir_path) {
+        eprintln!("Error: Failed to initialize config: {}", e);
+        std::process::exit(1);
+    }
+
     match sub_matches.subcommand() {
         Some(("set", matches)) => {
             let key = matches
